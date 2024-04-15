@@ -10,8 +10,6 @@ type ResizeEventHandler=Arc<dyn Fn(ResizeEvent)->Result<(i32,i32),String>+Send+S
 
 struct ResizeEventListener {
     events: mpsc::Sender<ResizeEvent>,
-    handler: ResizeEventHandler,
-    window: Arc<Mutex<Window>>,
 }
 
 impl ResizeEventListener {
@@ -38,8 +36,6 @@ impl ResizeEventListener {
 
         Self {
             events:tx,
-            handler,
-            window,
         }
     }
 

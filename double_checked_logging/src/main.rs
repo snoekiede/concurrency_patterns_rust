@@ -2,22 +2,22 @@ use std::sync::{Arc, Mutex, Once};
 
 #[derive(Debug, Clone)]
 #[allow(dead_code)]
-struct ExpensiveCar {
+struct ThreeDimensionalPrinter {
     name: String,
-    price: u32,
+    is_printing: bool,
 }
 
-impl ExpensiveCar {
-    fn default() -> Self {
-        ExpensiveCar {
+impl ThreeDimensionalPrinter {
+    fn new() -> Self {
+        ThreeDimensionalPrinter {
             name: "default".to_string(),
-            price: 100,
+            is_printing: false,
         }
     }
 }
 
 #[derive(Debug)]
-pub struct Lazy<T> {
+pub struct DoubleCheckedLockedStore<T> {
     // The `Once` type ensures that the initialization code is run at most once.
     once: Once,
     // We use `Mutex` to safely mutate the value across threads.
@@ -25,10 +25,10 @@ pub struct Lazy<T> {
     value: Mutex<Option<Arc<T>>>,
 }
 
-impl<T> Lazy<T> {
+impl<T> DoubleCheckedLockedStore<T> {
     // Constructor for the lazy value.
     pub fn new() -> Self {
-        Lazy {
+        DoubleCheckedLockedStore {
             once: Once::new(),
             value: Mutex::new(None),
         }
@@ -36,8 +36,8 @@ impl<T> Lazy<T> {
 
     // This function provides access to the lazily initialized value.
     pub fn get_or_init<F>(&self, init: F) -> Arc<T>
-    where
-        F: FnOnce() -> T,
+        where
+            F: FnOnce() -> T,
     {
         // Fast path: if the value is already initialized, return it.
         // We do this by attempting to lock the mutex and seeing if the value is present.
@@ -58,9 +58,9 @@ impl<T> Lazy<T> {
     }
 }
 fn main() {
-    let locked_value = Lazy::new();
+    let locked_value = DoubleCheckedLockedStore::new();
     {
-        locked_value.get_or_init(|| ExpensiveCar::default());
+        locked_value.get_or_init(|| ThreeDimensionalPrinter::new());
         let result_value = locked_value.value.lock().unwrap();
         match result_value.as_ref() {
             Some(value) => println!("value is {:?}", value),
