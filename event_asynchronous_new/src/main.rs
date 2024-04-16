@@ -90,7 +90,15 @@ impl Window {
 
 
 fn main() {
-W
+    let window = Window::new(
+        "My Window".to_string(),
+        800,
+        600,
+        Arc::new(|event| {
+            println!("Window is resized to {}x{}", event.width, event.height);
+            Ok((event.width, event.height))
+        }),
+    );
 
     window.lock().unwrap().open();
     window.lock().unwrap().resize(ResizeEvent {
