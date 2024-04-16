@@ -40,7 +40,15 @@ impl ResizeEventListener {
     }
 
     fn send(&self,event:ResizeEvent) {
-        self.events.send(event).unwrap();
+        match self.events.send(event) {
+            Ok(_)=>{
+                println!("Event sent successfully");
+            },
+            Err(err)=>{
+                println!("Failed to send event: {}",err);
+            },
+        }
+
     }
 }
 
@@ -69,7 +77,6 @@ impl Window {
         if let Some(listener)=&self.listener {
             listener.send(event);
         }
-
     }
 
     fn open(&self) {
@@ -83,15 +90,7 @@ impl Window {
 
 
 fn main() {
-    let window = Window::new(
-        "My Window".to_string(),
-        800,
-        600,
-        Arc::new(|event| {
-            println!("Window is resized to {}x{}", event.width, event.height);
-            Ok((event.width, event.height))
-        }),
-    );
+W
 
     window.lock().unwrap().open();
     window.lock().unwrap().resize(ResizeEvent {
